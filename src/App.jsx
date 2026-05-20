@@ -8,6 +8,8 @@ function App() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [shuffleQuestions, setShuffleQuestions] = useState(false)
+  const [shuffleAnswers, setShuffleAnswers] = useState(false)
 
   // Load questions from API on mount
   useEffect(() => {
@@ -94,7 +96,32 @@ function App() {
         <div className="app-container">
           <div className="quiz-section">
             {questions.length > 0 ? (
-              <Quiz questions={questions} onRemove={removeQuestion} />
+              <>
+                <div className="shuffle-controls">
+                  <label className="shuffle-option">
+                    <input
+                      type="checkbox"
+                      checked={shuffleQuestions}
+                      onChange={(e) => setShuffleQuestions(e.target.checked)}
+                    />
+                    <span>Shuffle Questions</span>
+                  </label>
+                  <label className="shuffle-option">
+                    <input
+                      type="checkbox"
+                      checked={shuffleAnswers}
+                      onChange={(e) => setShuffleAnswers(e.target.checked)}
+                    />
+                    <span>Shuffle Answers</span>
+                  </label>
+                </div>
+                <Quiz
+                  questions={questions}
+                  onRemove={removeQuestion}
+                  shuffleQuestions={shuffleQuestions}
+                  shuffleAnswers={shuffleAnswers}
+                />
+              </>
             ) : (
               <div className="no-questions">
                 <p>No questions available. Add some questions to get started!</p>

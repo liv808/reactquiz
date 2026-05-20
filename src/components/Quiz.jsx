@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import '../styles/Quiz.css'
 import QuestionCard from './QuestionCard'
+import { shuffleArray, shuffleAnswers } from '../utils/shuffle'
 
-function Quiz({ questions, onRemove }) {
+function Quiz({ questions, onRemove, shuffleQuestions: shouldShuffleQuestions, shuffleAnswers: shouldShuffleAnswers }) {
   const [quizQuestions, setQuizQuestions] = useState([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -13,14 +14,26 @@ function Quiz({ questions, onRemove }) {
 
   // Initialize quizQuestions when questions prop changes
   useEffect(() => {
-    setQuizQuestions([...questions])
+    let processedQuestions = [...questions]
+
+    // Shuffle questions if enabled
+    if (shouldShuffleQuestions) {
+      processedQuestions = shuffleArray(processedQuestions)
+    }
+
+    // Shuffle answers for each question if enabled
+    if (shouldShuffleAnswers) {
+      processedQuestions = processedQuestions.map((q) => shuffleAnswers(q))
+    }
+
+    setQuizQuestions(processedQuestions)
     setCurrentQuestionIndex(0)
     setSelectedAnswer(null)
     setAnswered(false)
     setScore(0)
     setWrongCount(0)
     setShowScore(false)
-  }, [questions])
+  }, [questions, shouldShuffleQuestions, shouldShuffleAnswers])
 
   if (quizQuestions.length === 0) {
     return <div className="no-questions">No questions available</div>
@@ -37,7 +50,14 @@ function Quiz({ questions, onRemove }) {
         setScore(score + 1)
       } else {
         // Add wrong question to the back of the list
-        setQuizQuestions([...quizQuestions, currentQuestion])
+        let questionToAppend = currentQuestion
+        
+        // Shuffle answers again if shuffle answers option is enabled
+        if (shouldShuffleAnswers) {
+          questionToAppend = shuffleAnswers(currentQuestion)
+        }
+        
+        setQuizQuestions([...quizQuestions, questionToAppend])
         setWrongCount(wrongCount + 1)
       }
     }
@@ -55,7 +75,19 @@ function Quiz({ questions, onRemove }) {
   }
 
   const handleRestart = () => {
-    setQuizQuestions([...questions])
+    let processedQuestions = [...questions]
+
+    // Shuffle questions if enabled
+    if (shouldShuffleQuestions) {
+      processedQuestions = shuffleArray(processedQuestions)
+    }
+
+    // Shuffle answers for each question if enabled
+    if (shouldShuffleAnswers) {
+      processedQuestions = processedQuestions.map((q) => shuffleAnswers(q))
+    }
+
+    setQuizQuestions(processedQuestions)
     setCurrentQuestionIndex(0)
     setSelectedAnswer(null)
     setAnswered(false)
